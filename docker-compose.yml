@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+  message-broker:
+    build: ./message-broker
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./message-broker/app:/usr/src/app
+    container_name: message-broker
+    environment:
+      - TZ=America/Bogota
+
+  modulo-pedidos:
+    build: ./modulo-pedidos
+    ports:
+      - "5002:5000"
+    volumes:
+      - ./modulo-pedidos/app:/usr/src/app
+    container_name: modulo-pedidos
+    environment:
+      - TZ=America/Bogota
+
+  modulo-pedidos-2:
+    build: ./modulo-pedidos-2
+    ports:
+      - "5003:5000"
+    volumes:
+      - ./modulo-pedidos-2/app:/usr/src/app
+    container_name: modulo-pedidos-2
+    environment:
+      - TZ=America/Bogota
+
+  modulo-pedidos-3:
+    build: ./modulo-pedidos-3
+    ports:
+      - "5004:5000"
+    volumes:
+      - ./modulo-pedidos-3/app:/usr/src/app
+    container_name: modulo-pedidos-3
+    environment:
+      - TZ=America/Bogota
+
+  monitor:
+    build: ./monitor
+    ports:
+      - "5005:5000"
+    volumes:
+      - ./monitor/app:/usr/src/app
+    container_name: monitor
+    environment:
+      - TZ=America/Bogota
+
