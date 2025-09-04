@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   redis:
@@ -15,36 +13,9 @@ services:
     container_name: message-broker
     environment:
       - TZ=America/Bogota
-
-  modulo-pedidos:
-    build: ./modulo-pedidos
-    ports:
-      - "5002:5000"
-    volumes:
-      - ./modulo-pedidos/app:/usr/src/app
-    container_name: modulo-pedidos
-    environment:
-      - TZ=America/Bogota
-
-  modulo-pedidos-2:
-    build: ./modulo-pedidos-2
-    ports:
-      - "5003:5000"
-    volumes:
-      - ./modulo-pedidos-2/app:/usr/src/app
-    container_name: modulo-pedidos-2
-    environment:
-      - TZ=America/Bogota
-
-  modulo-pedidos-3:
-    build: ./modulo-pedidos-3
-    ports:
-      - "5004:5000"
-    volumes:
-      - ./modulo-pedidos-3/app:/usr/src/app
-    container_name: modulo-pedidos-3
-    environment:
-      - TZ=America/Bogota
+    depends_on:
+      - redis
+      - monitor
 
   monitor:
     build: ./monitor
@@ -55,4 +26,42 @@ services:
     container_name: monitor
     environment:
       - TZ=America/Bogota
+      
+  modulo-pedidos:
+    build: ./modulo-pedidos
+    ports:
+      - "5002:5000"
+    volumes:
+      - ./modulo-pedidos/app:/usr/src/app
+    container_name: modulo-pedidos
+    environment:
+      - TZ=America/Bogota
+    depends_on:
+      - redis
+
+  modulo-pedidos-2:
+    build: ./modulo-pedidos-2
+    ports:
+      - "5003:5000"
+    volumes:
+      - ./modulo-pedidos-2/app:/usr/src/app
+    container_name: modulo-pedidos-2
+    environment:
+      - TZ=America/Bogota
+    depends_on:
+      - redis
+
+  modulo-pedidos-3:
+    build: ./modulo-pedidos-3
+    ports:
+      - "5004:5000"
+    volumes:
+      - ./modulo-pedidos-3/app:/usr/src/app
+    container_name: modulo-pedidos-3
+    environment:
+      - TZ=America/Bogota
+    depends_on:
+      - redis
+
+
 

@@ -1,5 +1,9 @@
 from flask import Flask, request, jsonify
 from datetime import datetime, timezone
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 
@@ -36,7 +40,7 @@ def reportar_heartbeat():
     ULTIMOS_HEARTBEATS[servicio_origen] = ahora_utc
     LATENCIAS[servicio_origen] = latencia.total_seconds()
 
-    print(f"✅ Heartbeat recibido de '{servicio_origen}'. Latencia: {latencia.total_seconds():.4f} segundos.")
+    logging.info(f"✅ Heartbeat recibido de '{servicio_origen}'. Latencia: {latencia.total_seconds():.4f} segundos.")
     
     return jsonify({
         "status": "OK",

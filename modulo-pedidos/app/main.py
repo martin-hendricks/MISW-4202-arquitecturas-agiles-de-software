@@ -6,6 +6,10 @@ import os
 import redis
 from rq import Queue
 from apscheduler.schedulers.background import BackgroundScheduler
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 
@@ -16,11 +20,11 @@ redis_conn = redis.Redis(host=redis_host, port=redis_port)
 q = Queue(connection=redis_conn)
 
 # Scheduler interval configuration
-SCHEDULER_INTERVAL_SECONDS = int(os.environ.get('SCHEDULER_INTERVAL_SECONDS', 5))
+SCHEDULER_INTERVAL_SECONDS = int(os.environ.get('SCHEDULER_INTERVAL_SECONDS', 16))
 
 def encolar_tarea():
     """
-    lo encola en Redis.
+    Encola una tarea en Redis.
     """
     with app.app_context():
         pedido_id = str(uuid.uuid4())
@@ -36,19 +40,22 @@ def encolar_tarea():
 
         q.enqueue('tasks.heartbeat_ping', task_payload)
         
-        print(f"Tarea encolada: {task_payload}")
+        logging.info(f"Tarea encolada: {task_payload}")
 
 @app.route('/')
 def home():
     return jsonify({"mensaje": "Hola, soy el microservicio de pedidos! Ahora funciono como un scheduler."})
 
+# Initialize and start the scheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(encolar_tarea, 'interval', seconds=SCHEDULER_INTERVAL_SECONDS)
+scheduler.start()
+logging.info(f"Scheduler iniciado. Encolando tareas cada {SCHEDULER_INTERVAL_SECONDS} segundos.")
+
+
 if __name__ == '__main__':
-
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(encolar_tarea, 'interval', seconds=SCHEDULER_INTERVAL_SECONDS)
-    scheduler.start()
-    print(f"Scheduler iniciado. Encolando tareas cada {SCHEDULER_INTERVAL_SECONDS} segundos.")
-
+    # This block is now only for local development (python main.py)
+    # The scheduler is already started above.
     try:
         app.run(host='0.0.0.0', port=5000)
     except (KeyboardInterrupt, SystemExit):
