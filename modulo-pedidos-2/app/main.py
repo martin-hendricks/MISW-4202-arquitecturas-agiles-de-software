@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import uuid
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -46,11 +46,51 @@ def encolar_tarea():
 def home():
     return jsonify({"mensaje": "Hola, soy el microservicio de respaldo zona 1 de pedidos! Ahora funciono como un scheduler."})
 
+@app.route('/shutdown', methods=['POST'])
+def shutdown_scheduler():
+    """
+    Shuts down the component.
+    """
+    try:
+        scheduler.shutdown()
+        logging.info("component shut down via API request.")
+        return jsonify({"mensaje": "component shut down successfully."}), 200
+    except Exception as e:
+        logging.error(f"Error shutting down component: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/reschedule', methods=['POST'])
+def reschedule_job():
+    """
+    Reschedules the task with a new interval.
+    """
+    data = request.get_json()
+    if not data or 'interval' not in data:
+        return jsonify({"error": "Missing 'interval' in request body"}), 400
+
+    try:
+        new_interval = int(data['interval'])
+        if new_interval <= 0:
+            raise ValueError("Interval must be a positive integer.")
+            
+        scheduler.reschedule_job('encolar_tarea_job', trigger='interval', seconds=new_interval)
+        
+        global SCHEDULER_INTERVAL_SECONDS
+        SCHEDULER_INTERVAL_SECONDS = new_interval
+        
+        logging.info(f"Job 'encolar_tarea_job' rescheduled to run every {new_interval} seconds.")
+        return jsonify({"mensaje": f"Scheduler interval updated to {new_interval} seconds."}), 200
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid interval format. Must be a positive integer."}), 400
+    except Exception as e:
+        logging.error(f"Error rescheduling job: {e}")
+        return jsonify({"error": str(e)}), 500
+
 # Initialize and start the scheduler
 scheduler = BackgroundScheduler()
-scheduler.add_job(encolar_tarea, 'interval', seconds=SCHEDULER_INTERVAL_SECONDS)
+scheduler.add_job(encolar_tarea, 'interval', seconds=SCHEDULER_INTERVAL_SECONDS, id='encolar_tarea_job')
 scheduler.start()
-logging.info(f"Scheduler iniciado. respaldo zona 1 de pedidos! Encolando tareas cada {SCHEDULER_INTERVAL_SECONDS} segundos.")
+logging.info(f"component iniciado. respaldo zona 1 de pedidos! Encolando tareas cada {SCHEDULER_INTERVAL_SECONDS} segundos.")
 
 
 if __name__ == '__main__':
