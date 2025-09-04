@@ -40,7 +40,7 @@ def reportar_heartbeat():
     ULTIMOS_HEARTBEATS[servicio_origen] = ahora_utc
     LATENCIAS[servicio_origen] = latencia.total_seconds()
 
-    logging.info(f"✅ Heartbeat recibido de '{servicio_origen}'. Latencia: {latencia.total_seconds():.4f} segundos.")
+    logging.info(f"✅ Heartbeat recibido de '{servicio_origen}'. Mensaje: {data}. Timestamp: {timestamp_str}. Latencia: {latencia.total_seconds():.4f} segundos.")
     
     return jsonify({
         "status": "OK",
