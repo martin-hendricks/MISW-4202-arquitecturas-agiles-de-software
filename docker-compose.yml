@@ -23,6 +23,7 @@ services:
       - "5005:5000"
     volumes:
       - ./monitor/app:/usr/src/app
+      - ./logs/monitor:/var/logs/monitor
     container_name: monitor
     environment:
       - TZ=America/Bogota

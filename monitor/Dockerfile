@@ -2,6 +2,9 @@ FROM python:3.9-slim
 
 WORKDIR /usr/src/app
 
+# Crear directorio de logs
+RUN mkdir -p /var/logs/monitor
+
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 

@@ -20,7 +20,7 @@ redis_conn = redis.Redis(host=redis_host, port=redis_port)
 q = Queue(connection=redis_conn)
 
 # Scheduler interval configuration
-SCHEDULER_INTERVAL_SECONDS = int(os.environ.get('SCHEDULER_INTERVAL_SECONDS', 13))
+SCHEDULER_INTERVAL_SECONDS = int(os.environ.get('SCHEDULER_INTERVAL_SECONDS', 3))
 
 def encolar_tarea():
     """
