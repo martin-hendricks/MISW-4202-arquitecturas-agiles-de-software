@@ -1,0 +1,49 @@
+services:
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+  message-broker:
+    build: ./message-broker
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./message-broker/app:/usr/src/app
+    container_name: message-broker
+    environment:
+      - TZ=America/Bogota
+    depends_on:
+      - redis
+      - monitor
+
+  seguridad:
+    build: ./seguridad
+    ports:
+      - "5006:5000"
+    volumes:
+      - ./seguridad/app:/usr/src/app
+      - ./logs/seguridad:/var/logs/seguridad
+    container_name: seguridad
+    environment:
+      - TZ=America/Bogota
+    depends_on:
+      - redis
+      - message-broker
+      - logistica
+
+  logistica:
+    build: ./logistica
+    ports:
+      - "5007:5000"
+    volumes:
+      - ./logistica/app:/usr/src/app
+      - ./logs/logistica:/var/logs/logistica
+    container_name: logistica
+    environment:
+      - TZ=America/Bogota
+    depends_on:
+      - redis
+
+
+
