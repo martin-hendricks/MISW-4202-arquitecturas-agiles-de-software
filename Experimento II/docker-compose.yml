@@ -31,6 +31,7 @@ services:
       - redis
       - message-broker
       - logistica
+      - db_seguridad
 
   logistica:
     build: ./logistica
@@ -44,6 +45,18 @@ services:
       - TZ=America/Bogota
     depends_on:
       - redis
+
+  db_usuarios:
+    image: postgres:latest
+    container_name: db_usuarios
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=usuarios
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db-usuarios/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 
 
