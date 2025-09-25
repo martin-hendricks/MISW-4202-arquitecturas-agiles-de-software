@@ -6,8 +6,19 @@ from flask import Flask, request, jsonify
 from datetime import datetime, timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 
+# Importar configuración y database
+from config import get_config, validate_environment
+from database import db_manager, execute_query, execute_query_one, execute_command
+
+# Validar configuración al importar
+if not validate_environment():
+    exit(1)
+
+# Obtener configuración
+config = get_config()
+
 # Crear directorio de logs si no existe
-LOGS_DIR = '/var/logs/monitor'  # Dentro del contenedor
+LOGS_DIR = config.LOGS_DIR
 if not os.path.exists(LOGS_DIR):
     os.makedirs(LOGS_DIR)
 
@@ -99,13 +110,32 @@ def reportar_evento():
     if not data:
         logger.error("Request body vacío o no JSON")
         return jsonify({"status": "error", "mensaje": "Request body debe ser JSON"}), 400
+    
+    logger.debug("Received /reportar-evento request with data: %s", data)
+
+    result = execute_query_one("SELECT id_usuario, acceso, pais_origen FROM usuarios WHERE id_usuario = %s", (data.get('id_usuario'),))
+    
+    if result is None:
+        logger.info("Usuario no encontrado en la consulta")
+        return 200
+    
+    logger.debug(f"************************ Resultado de la consulta: {result} ************************")
+    
+    user = result.get("id_usuario")
+    acceso = result.get("acceso")
+    pais_origen = result.get("pais_origen")
+
+    
+    if data.get('pais_consulta') != pais_origen:
+        logger.warning(f"Acceso denegado para usuario {user}, no tiene permisos para consultar el pais {data.get('pais_consulta')} ¡se deben inactivar sesiones!")
+        return jsonify({"status": "error", "mensaje": "Acceso denegado por país de origen"}), 403
+    
 
     timestamp_str = data.get('timestamp')
 
     if not timestamp_str:
         return jsonify({"status": "error", "mensaje": "Falta el timestamp"}), 400
 
-    # Comparar la fecha que llega con la fecha actual
     try:
         # El timestamp viene en formato ISO 8601 con timezone
         timestamp_origen = datetime.fromisoformat(timestamp_str)

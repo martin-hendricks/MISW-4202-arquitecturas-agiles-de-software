@@ -26,6 +26,15 @@ services:
     container_name: seguridad
     environment:
       - TZ=America/Bogota
+      - FLASK_ENV=development
+      - DB_HOST=db_usuarios
+      - DB_PORT=5432
+      - DB_NAME=usuarios
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - SECRET_KEY=seguridad-secret-key-dev
+      - LOG_LEVEL=INFO
+      - LOGS_DIR=/var/logs/seguridad
     depends_on:
       - redis
       - logistica
