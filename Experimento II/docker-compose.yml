@@ -15,8 +15,7 @@ services:
       - TZ=America/Bogota
     depends_on:
       - redis
-      - monitor
-
+      - seguridad
   seguridad:
     build: ./seguridad
     ports:
@@ -29,9 +28,8 @@ services:
       - TZ=America/Bogota
     depends_on:
       - redis
-      - message-broker
       - logistica
-      - db_seguridad
+      - db_usuarios
 
   logistica:
     build: ./logistica

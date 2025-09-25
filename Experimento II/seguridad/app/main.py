@@ -79,6 +79,7 @@ def setup_logging():
     return logger
 
 # Configurar logging
+evento_logger = logging.getLogger('evento')
 logger = setup_logging()
 
 # Configure logging básico (para compatibilidad)
@@ -115,11 +116,11 @@ def reportar_evento():
     latencia = ahora_utc - timestamp_origen
 
     # Guardar ultimo heartbeat y latencia
-    ULTIMOS_EVENTOS["timestamp_origen"] = ahora_utc
-    LATENCIAS["timestamp_origen"] = latencia.total_seconds()
+    ULTIMOS_EVENTOS["Logistica"] = ahora_utc
+    LATENCIAS["Logistica"] = latencia.total_seconds()
 
     # Log específico para heartbeats (archivo separado)
-    evento_logger.info(f"Servicio: {"timestamp_origen"} | Latencia: {latencia.total_seconds():.4f}s | Timestamp: {timestamp_str}")
+    evento_logger.info(f"Servicio: Logistica | Latencia: {latencia.total_seconds():.4f}s | Timestamp: {timestamp_str}")
     
     # Log general
     logger.info(f"Evento recibido de Logistica - Latencia: {latencia.total_seconds():.4f}s")
