@@ -23,7 +23,7 @@ q = Queue(connection=redis_conn)
 # Scheduler interval configuration
 SCHEDULER_INTERVAL_SECONDS = int(os.environ.get('SCHEDULER_INTERVAL_SECONDS', 3))
 
-PAISES = ['CO','MX','PE','VE','BR']
+PAISES = ['CO','MX','PE','VE','BR', 'AR', 'CL', 'UY']
 
 def encolar_tarea():
     """
@@ -34,7 +34,7 @@ def encolar_tarea():
         colombia_tz = ZoneInfo("America/Bogota")
         now_colombia = datetime.now(colombia_tz)
         timestamp = now_colombia.isoformat()
-        id_usuario = random.randint(1, 100)
+        id_usuario = random.randint(1, 20)
         pais_consulta = random.choice(PAISES)
 
         task_payload = {
