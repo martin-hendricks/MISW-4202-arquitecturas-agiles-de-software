@@ -128,6 +128,27 @@ def reportar_evento():
     
     if data.get('pais_consulta') != pais_origen:
         logger.warning(f"Acceso denegado para usuario {user}, no tiene permisos para consultar el pais {data.get('pais_consulta')} ¡se deben inactivar sesiones!")
+        
+        try:
+            rows_affected = execute_command(
+                "UPDATE usuarios SET acceso = false WHERE id_usuario = %s", 
+                (user,)
+            )
+            logger.info(f"Usuario {user} desactivado - Filas afectadas: {rows_affected}")
+            
+            usuario_actualizado = execute_query_one(
+                "SELECT * FROM usuarios WHERE id_usuario = %s", 
+                (user,)
+            )
+            
+            if usuario_actualizado:
+                logger.info(f"Registro completo del usuario {user} después de la actualización: {usuario_actualizado}")
+            else:
+                logger.error(f"No se pudo consultar el usuario {user} después de la actualización")
+                
+        except Exception as e:
+            logger.error(f"Error al actualizar el usuario {user} en la base de datos: {e}")
+        
         return jsonify({"status": "error", "mensaje": "Acceso denegado por país de origen"}), 403
     
 
