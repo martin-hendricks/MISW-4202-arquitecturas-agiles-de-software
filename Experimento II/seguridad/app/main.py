@@ -29,7 +29,7 @@ def setup_logging():
     date_format = '%Y-%m-%d %H:%M:%S'
     
     # Logger principal
-    logger = logging.getLogger('monitor')
+    logger = logging.getLogger('seguridad')
     logger.setLevel(logging.DEBUG)
     
     # Limpiar handlers existentes
@@ -47,7 +47,7 @@ def setup_logging():
     
     # Handler para archivo general (rotación por tamaño)
     general_file_handler = RotatingFileHandler(
-        os.path.join(LOGS_DIR, 'monitor_general.log'),
+        os.path.join(LOGS_DIR, 'seguridad_general.log'),
         maxBytes=10*1024*1024,  # 10 MB
         backupCount=5
     )
@@ -58,7 +58,7 @@ def setup_logging():
     
     # Handler para errores y alertas (rotación diaria)
     alerts_file_handler = TimedRotatingFileHandler(
-        os.path.join(LOGS_DIR, 'monitor_alerts.log'),
+        os.path.join(LOGS_DIR, 'seguridad_alerts.log'),
         when='midnight',
         interval=1,
         backupCount=30
